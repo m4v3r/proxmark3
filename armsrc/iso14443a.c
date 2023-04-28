@@ -1033,7 +1033,8 @@ bool SimulateIso14443aInit(uint8_t tagType, uint16_t flags, uint8_t *data, tag_r
     static uint8_t rRATS[] = { 0x05, 0x75, 0x80, 0x60, 0x02, 0x00, 0x00, 0x00 };
 
     // GET_VERSION response for EV1/NTAG
-    static uint8_t rVERSION[10] = { 0x00 };
+    //static uint8_t rVERSION[10] = { 0x00 };
+    static uint8_t rVERSION[10] = { 0x00, 0x04, 0x04, 0x02, 0x01, 0x00, 0x11, 0x03 };
     // READ_SIG response for EV1/NTAG
     static uint8_t rSIGN[34] = { 0x00 };
     // PPS response
@@ -1066,11 +1067,8 @@ bool SimulateIso14443aInit(uint8_t tagType, uint16_t flags, uint8_t *data, tag_r
             }
 
             // GET_VERSION
-            if (memcmp(mfu_header->version, "\x00\x00\x00\x00\x00\x00\x00\x00", 8) == 0) {
-                memcpy(rVERSION, "\x00\x04\x04\x02\x01\x00\x11\x03", 8);
-            } else {
-                memcpy(rVERSION, mfu_header->version, 8);
-            }
+           (memcmp(mfu_header->version, "\x00\x00\x00\x00\x00\x00\x00\x00", 8) == 0) {
+            memcpy(rVERSION, "\x00\x04\x04\x02\x01\x00\x11\x03", 8);
             AddCrc14A(rVERSION, sizeof(rVERSION) - 2);
 
             // READ_SIG
@@ -1682,8 +1680,7 @@ void SimulateIso14443aTag(uint8_t tagType, uint16_t flags, uint8_t *data, uint8_
             LogTrace(receivedCmd, Uart.len, Uart.startTime * 16 - DELAY_AIR2ARM_AS_TAG, Uart.endTime * 16 - DELAY_AIR2ARM_AS_TAG, Uart.parity, true);
             p_response = NULL;
         } else if (receivedCmd[0] == MIFARE_ULEV1_AUTH && len == 7 && tagType == 7) { // NTAG / EV-1 authentication
-
-            /*
+            
             // PWD stored in dump now
             uint8_t pwd[4];
             emlGetMemBt(pwd, (pages - 1) * 4 + MFU_DUMP_PREFIX_LENGTH, sizeof(pwd));
